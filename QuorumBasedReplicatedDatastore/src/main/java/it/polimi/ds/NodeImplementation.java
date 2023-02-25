@@ -1,16 +1,30 @@
 package it.polimi.ds;
 
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-public class Node implements Remote {
+import static java.lang.System.exit;
+
+public class NodeImplementation extends UnicastRemoteObject implements NodeInterface {
+    private final MasterNodeImplementation masterNode;
+
+    public NodeImplementation(MasterNodeImplementation masterNode) throws RemoteException {
+        super();
+        this.masterNode = masterNode;
+    }
 
     Map<Integer, Collection<Integer>> historyDB = new HashMap<>();
     Map<Integer, Integer> lastWrite = new HashMap<>();
     Map<Integer,Integer> committedValues = new HashMap<>();
 
-    public synchronized void handlePutRequest(int k, int v) throws RemoteException {
+
+    public synchronized void put(int k, int v) throws RemoteException {
         Collection<Integer> tempValues = historyDB.get(k);
         if(tempValues == null)
             tempValues = new ArrayList<>();
@@ -21,7 +35,8 @@ public class Node implements Remote {
 
     }
 
-    public synchronized void handleAbortPutRequest(int k, int v) throws RemoteException{
+    @Override
+    public synchronized void handleAbortPut(int k, int v) throws RemoteException{
         System.out.println("Aborted key "+ k + "value "+v);
         Collection<Integer> tempValues = historyDB.remove(k);
         if(tempValues == null || tempValues.isEmpty())
@@ -33,16 +48,23 @@ public class Node implements Remote {
             lastWrite.remove(k);
     }
 
-    public synchronized void commitPut(int k, int v) throws RemoteException {
-        System.out.println("Committed key "+k+" value "+v);
+    @Override
+    public synchronized void handleCommitPut(int k, int v) throws RemoteException {
+        System.out.println("Committed key "+ k +" value "+v);
         historyDB.remove(k);
         lastWrite.remove(k);
         committedValues.put(k, v);
     }
 
-    public synchronized Integer handleGetRequest(int k) throws RemoteException {
+    public boolean vote(int k, int v) throws RemoteException {
+        return historyDB.containsKey(k) && historyDB.get(k).contains(v)
+                && lastWrite.containsKey(k) && lastWrite.get(k) == v;
+    }
+
+    public synchronized Integer get(int k) throws RemoteException {
         return committedValues.get(k);
     }
+
 
     public synchronized Map<Integer, Integer> getCommitedValues() throws RemoteException {
         return new HashMap<>(committedValues);
@@ -50,11 +72,8 @@ public class Node implements Remote {
 
     public synchronized void printValues() throws RemoteException {
         for(Integer key : committedValues.keySet()) {
-            System.out.println("value (" + key + ", " + committedValues.get(key) + ")");
+            System.out.println("value: (" + key + ", " + committedValues.get(key) + ")");
         }
     }
-
-
-
 
 }
