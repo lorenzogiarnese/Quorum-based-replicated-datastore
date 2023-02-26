@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Map;
 
 public interface NodeInterface extends Remote {
-     void put(int key, int value) throws RemoteException;
+     boolean put(int key, int value) throws RemoteException;
      Integer get(int key) throws RemoteException;
 
      void handleAbortPut(int k, int v) throws RemoteException;
@@ -13,4 +13,5 @@ public interface NodeInterface extends Remote {
      boolean vote(int k, int v) throws RemoteException;
 
      Map<Integer, Integer> getCommitedValues() throws RemoteException;
+
 }

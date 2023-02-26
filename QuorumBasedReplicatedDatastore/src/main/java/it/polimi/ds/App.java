@@ -89,8 +89,10 @@ public class App
             System.out.println("Server says: " + stub.handlePutRequest(key,value));
         } catch (RemoteException e) {
             throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-    }
+        }
 }
 
 
