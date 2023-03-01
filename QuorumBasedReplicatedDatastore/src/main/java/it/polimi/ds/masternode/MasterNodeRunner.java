@@ -1,4 +1,4 @@
-package it.polimi.ds;
+package it.polimi.ds.masternode;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -14,12 +14,11 @@ public class MasterNodeRunner {
             Registry registry = LocateRegistry.createRegistry(1099);
             UnicastRemoteObject.exportObject(masterNode,0);
             registry.bind("masternode", masterNode);
-            System.out.println("Masternode ready");
+            System.out.println("Masternode bound");
         }catch(Exception e) {
             System.err.println("Error during masternode registration"+ e.getMessage());
             e.printStackTrace();
         }
-
 
     }
 }

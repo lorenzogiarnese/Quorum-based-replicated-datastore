@@ -1,15 +1,25 @@
-package it.polimi.ds;
+package it.polimi.ds.node;
 
+import it.polimi.ds.masternode.MasterNodeImplementation;
+
+import java.net.InetAddress;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
 public class NodeImplementation extends UnicastRemoteObject implements NodeInterface {
     private final MasterNodeImplementation masterNode;
+    private String ipAddress;
 
-    public NodeImplementation(MasterNodeImplementation masterNode) throws RemoteException {
+    public NodeImplementation(String masterNodeIpAddress) throws RemoteException, NotBoundException {
         super();
-        this.masterNode = masterNode;
+        this.ipAddress = getIpAddress();
+        Registry registry = LocateRegistry.getRegistry(masterNodeIpAddress);
+        masterNode = (MasterNodeImplementation) registry.lookup("masternode");
+        masterNode.addNode(ipAddress);
     }
 
     Map<Integer, Collection<Integer>> historyDB = new HashMap<>();
@@ -64,11 +74,22 @@ public class NodeImplementation extends UnicastRemoteObject implements NodeInter
         return new HashMap<>(committedValues);
     }
 
+    private String getIpAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            System.err.println("Error getting IP address:");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public synchronized void printValues() throws RemoteException {
         for(Integer key : committedValues.keySet()) {
             System.out.println("value: (" + key + ", " + committedValues.get(key) + ")");
         }
     }
+
 
 
 }

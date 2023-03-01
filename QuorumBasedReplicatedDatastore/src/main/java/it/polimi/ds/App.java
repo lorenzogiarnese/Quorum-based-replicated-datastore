@@ -1,5 +1,8 @@
 package it.polimi.ds;
 
+import it.polimi.ds.masternode.MasterNodeImplementation;
+import it.polimi.ds.masternode.MasterNodeInterface;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,7 +25,7 @@ public class App
             }
             try{
                 Registry registry = LocateRegistry.getRegistry(args[0],Integer.parseInt(args[1]));
-                stub = (MasterNodeInterface) registry.lookup("CoordinatorService");
+                stub = (MasterNodeInterface) registry.lookup("masternode");
             }catch(RemoteException e){
                 System.err.println("Registry is uninitialized or unavailable");
                 return;

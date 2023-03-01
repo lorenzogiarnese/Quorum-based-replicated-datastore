@@ -1,5 +1,8 @@
-package it.polimi.ds;
+package it.polimi.ds.masternode;
 
+
+import it.polimi.ds.node.NodeImplementation;
+import it.polimi.ds.node.NodeInterface;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -121,6 +124,15 @@ public class MasterNodeImplementation extends UnicastRemoteObject implements Mas
 
     public void setWriteQuorum(Integer writeQuorum) {
         this.writeQuorum = writeQuorum;
+    }
+
+    public void addNode(String ipAddress) throws RemoteException {
+        try {
+            NodeImplementation node = new NodeImplementation(ipAddress);
+            nodes.add(node);
+        } catch (Exception e) {
+            throw new RemoteException("Failed to add node: " + ipAddress, e);
+        }
     }
 
     private static void masterNodeConfiguration(MasterNodeImplementation masterNodeImplementation){

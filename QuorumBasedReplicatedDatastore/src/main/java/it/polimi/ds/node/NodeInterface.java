@@ -1,4 +1,4 @@
-package it.polimi.ds;
+package it.polimi.ds.node;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -11,7 +11,5 @@ public interface NodeInterface extends Remote {
      void handleAbortPut(int k, int v) throws RemoteException;
      void handleCommitPut(int k, int v) throws RemoteException;
      boolean vote(int k, int v) throws RemoteException;
-
-     Map<Integer, Integer> getCommitedValues() throws RemoteException;
 
 }
